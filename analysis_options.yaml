@@ -1,0 +1,15 @@
+# This file configures the Dart analyzer.
+#
+# The commented out part below is an example of how to enable stricter rules.
+# For more information, see:
+# https://dart.dev/guides/language/analysis-options
+
+include: package:lints/recommended.yaml
+
+# linter:
+#   rules:
+#     # Add specific rules here if needed. For example:
+#     - always_declare_return_types
+#     - prefer_final_locals
+#     - omit_local_variable_types
+#     - unawaited_futures

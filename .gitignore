@@ -1,0 +1,8 @@
+# Ignore sensitive data
+.env
+
+# Dart/Flutter specific
+.dart_tool/
+.packages
+build/
+*.lock
