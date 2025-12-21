@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:dotenv/dotenv.dart';
-import 'package:dart_pdf_translator/src/translators/translator.dart';
-import 'package:dart_pdf_translator/src/translators/gemini_translator.dart';
-import 'package:dart_pdf_translator/src/translators/ollama_translator.dart';
-import 'package:dart_pdf_translator/src/pdf_processor.dart';
+import 'package:ai_dart_pdf_translator/src/translators/translator.dart';
+import 'package:ai_dart_pdf_translator/src/translators/gemini_translator.dart';
+import 'package:ai_dart_pdf_translator/src/translators/ollama_translator.dart';
+import 'package:ai_dart_pdf_translator/src/pdf_processor.dart';
 
 Future<void> main(List<String> arguments) async {
   // --- 1. Load Configuration ---

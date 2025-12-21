@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:test/test.dart';
 import 'dart:io';
-import 'package:dart_pdf_translator/src/pdf_processor.dart';
+import 'package:ai_dart_pdf_translator/src/pdf_processor.dart';
 
 void main() {
   group('PopplerPdfProcessor', () {
