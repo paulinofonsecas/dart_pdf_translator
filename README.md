@@ -103,7 +103,7 @@ This tool is designed for developers who need to automate the translation of PDF
 - For programmatic usage, see the example below:
 
 ```dart
-import 'package:dart_pdf_translator/dart_pdf_translator.dart';
+import 'package:ai_dart_pdf_translator/ai_dart_pdf_translator.dart';
 
 void main() async {
     final processor = PopplerPdfProcessor();
@@ -123,7 +123,7 @@ This project includes a complete Flutter application in the `example/` directory
 
 ### Running the Example
 
-1.  **Set up the API Key**: Ensure you have a valid `GEMINI_API_KEY` in the main `.env` file at the root of *this* project (`dart_pdf_translator/.env`). The example app is configured to read the key from there.
+1.  **Set up the API Key**: Ensure you have a valid `GEMINI_API_KEY` in the main `.env` file at the root of *this* project (`ai_dart_pdf_translator/.env`). The example app is configured to read the key from there.
 2.  **Navigate to the example directory**:
     ```sh
     cd example

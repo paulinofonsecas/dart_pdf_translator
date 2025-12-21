@@ -1,4 +1,4 @@
-name: dart_pdf_translator
+name: ai_dart_pdf_translator
 description: A versatile command-line PDF translator that uses Gemini or a local Ollama instance for translation.
 version: 1.0.0
 homepage: https://github.com/paulinofonsecas/dart_pdf_translator
