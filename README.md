@@ -146,4 +146,4 @@ This package is ready to be published on [pub.dev](https://pub.dev).
 1. Update the `homepage` and `repository` fields in `pubspec.yaml`.
 2. Review the `LICENSE`, `CHANGELOG.md`, and documentation.
 3. Run `dart pub publish --dry-run` to validate the package.
-4. If everything is OK, publish with `dart pub publish`.
+4. If everything is OK, publish with `dart pub publish`
