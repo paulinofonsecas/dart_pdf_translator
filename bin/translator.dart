@@ -114,7 +114,7 @@ Translator _getTranslator(DotEnv env) {
     switch (engine) {
       case 'gemini':
         final apiKey = env['GEMINI_API_KEY'];
-        final modelName = env['GEMINI_MODEL'] ?? 'gemini-1.5-flash-latest';
+        final modelName = env['GEMINI_MODEL'] ?? 'gemini-1.5-flash';
         if (apiKey == null || apiKey == 'YOUR_API_KEY_HERE' || apiKey.isEmpty) {
           throw Exception(
               'GEMINI_API_KEY not found or not set in .env file. It is required when TRANSLATION_ENGINE is "gemini".');

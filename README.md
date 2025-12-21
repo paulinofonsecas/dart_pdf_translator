@@ -65,7 +65,7 @@ This tool is designed for developers who need to automate the translation of PDF
     # ---------------------------
     # Required if TRANSLATION_ENGINE is "gemini".
     GEMINI_API_KEY=YOUR_API_KEY_HERE
-    GEMINI_MODEL=gemini-1.5-flash-latest
+    GEMINI_MODEL=gemini-2.5-flash
 
     # ---------------------------
     # OLLAMA SETTINGS

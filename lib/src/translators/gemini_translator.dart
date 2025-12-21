@@ -6,7 +6,7 @@ class GeminiTranslator implements Translator {
   final GenerativeModel _model;
 
   /// Creates a new Gemini translator with the given [apiKey] and optional [modelName].
-  GeminiTranslator(String apiKey, {String modelName = 'gemini-1.5-flash-latest'})
+  GeminiTranslator(String apiKey, {String modelName = 'gemini-2.5-flash'})
       : _model = GenerativeModel(
           model: modelName,
           apiKey: apiKey,
