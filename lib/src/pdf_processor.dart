@@ -39,14 +39,24 @@ Future<int> _getPageCount(String filePath) async {
   return int.parse(pagesLine.split(':')[1].trim());
 }
 
-/// Extracts text from a PDF file, processing it page by page using `pdftotext`.
+/// Extracts text from a PDF file, supporting multi-page processing using `pdftotext`.
+///
+/// [filePath]: Path to the PDF file.
+/// [startPage]: (Optional) First page to extract (1-based, inclusive).
+/// [endPage]: (Optional) Last page to extract (1-based, inclusive). If not provided, extracts until the last page.
+/// [pagesPerBatch]: (Optional) Number of pages to process per batch. Default is 1 (legacy behavior).
 ///
 /// Throws a [FileSystemException] if the [filePath] is not found.
 /// Throws an [Exception] if the required Poppler tools are not installed.
 ///
 /// Returns a [Future] that completes with a list of strings, where each string
-/// is the text content of a single page.
-Future<List<String>> extractTextFromPdf(String filePath) async {
+/// is the text content of a single page (or batch, if pagesPerBatch > 1).
+Future<List<String>> extractTextFromPdf(
+  String filePath, {
+  int? startPage,
+  int? endPage,
+  int pagesPerBatch = 1,
+}) async {
   final file = File(filePath);
   if (!await file.exists()) {
     throw FileSystemException("File not found", filePath);
@@ -61,30 +71,53 @@ Future<List<String>> extractTextFromPdf(String filePath) async {
     final int pageCount = await _getPageCount(filePath);
     final List<String> pageTexts = [];
 
-    for (var i = 1; i <= pageCount; i++) {
-      // Use pdftotext to extract text from a single page and pipe to stdout.
+    final int firstPage = startPage ?? 1;
+    final int lastPage = endPage ?? pageCount;
+
+    if (firstPage < 1 || lastPage > pageCount || firstPage > lastPage) {
+      throw ArgumentError('Invalid page range: $firstPage-$lastPage for PDF with $pageCount pages.');
+    }
+
+    for (var i = firstPage; i <= lastPage; i += pagesPerBatch) {
+      final int batchStart = i;
+      final int batchEnd = (i + pagesPerBatch - 1).clamp(batchStart, lastPage);
+
       final result = await Process.run(
         'pdftotext',
         [
-          '-f', // First page flag
-          i.toString(),
-          '-l', // Last page flag
-          i.toString(),
+          '-f',
+          batchStart.toString(),
+          '-l',
+          batchEnd.toString(),
           filePath,
-          '-', // Pipe output to stdout
+          '-',
         ],
       );
 
       if (result.exitCode != 0) {
-        print('Warning: pdftotext failed for page $i: ${result.stderr}');
-        pageTexts.add(''); // Add an empty string for the failed page to maintain page order.
+        print('Warning: pdftotext failed for pages $batchStart-$batchEnd: ${result.stderr}');
+        // Add empty strings for each failed page to maintain order
+        for (var j = batchStart; j <= batchEnd; j++) {
+          pageTexts.add('');
+        }
       } else {
-        pageTexts.add(result.stdout.toString());
+        // If processing one page per batch, split is not needed
+        if (pagesPerBatch == 1) {
+          pageTexts.add(result.stdout.toString());
+        } else {
+          // Try to split the output into pages (heuristic: form feed '\f' is page break)
+          final pages = result.stdout.toString().split('\f');
+          // Remove trailing empty page if present
+          if (pages.isNotEmpty && pages.last.trim().isEmpty) {
+            pages.removeLast();
+          }
+          // Add each page's text
+          pageTexts.addAll(pages);
+        }
       }
     }
     return pageTexts;
   } catch (e) {
-    // Re-throw any exception that occurs during processing to be handled by the caller.
     throw Exception('An unexpected error occurred while processing the PDF with Poppler: $e');
   }
 }
