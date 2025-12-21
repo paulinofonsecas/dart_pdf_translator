@@ -18,7 +18,7 @@ This tool is designed for developers who need to automate the translation of PDF
 ## Prerequisites
 
 1.  **Dart SDK**: Make sure you have the [Dart SDK](https://dart.dev/get-dart) installed.
-2.  **Poppler**: The command-line tools `pdftotext` and `pdfinfo` are required for PDF processing.
+2.  **Poppler (for PDF extraction)**: The command-line tools `pdftotext` and `pdfinfo` are required for PDF processing on desktop/CLI.
 
     -   **macOS (via Homebrew):**
         ```sh
@@ -33,14 +33,17 @@ This tool is designed for developers who need to automate the translation of PDF
         sudo apt-get update && sudo apt-get install poppler-utils
         ```
 
-    *After installing, ensure the tools are available in your system's PATH.*
+    **Important:**
+    - After installing, ensure the tools are available in your system's PATH. You can test by running `pdftotext -v` and `pdfinfo -v` in your terminal.
+    - If you want to use a different PDF processor (e.g., for Flutter/mobile), you can implement your own `PdfProcessorStrategy`.
 
 ## Setup
 
 1.  **Clone the repository** or download the source code.
-2.  **Create an environment file**:
-    -   Rename `.env.example` to `.env`.
-    -   Open the `.env` file and fill in the required values based on your desired translation engine.
+
+2.  **Configure your environment (.env):**
+    -   Copy `.env.example` to `.env`.
+    -   Edit the `.env` file and fill in the values according to your desired translation engine.
 
     ```dotenv
     # ---------------------------
@@ -48,17 +51,17 @@ This tool is designed for developers who need to automate the translation of PDF
     # ---------------------------
     # The translation engine to use. Options: "gemini" or "ollama".
     TRANSLATION_ENGINE=gemini
-    
+
     # The language to translate the PDF text into (e.g., "English", "Portuguese").
     TARGET_LANGUAGE=English
-    
+
     # ---------------------------
     # GEMINI SETTINGS
     # ---------------------------
     # Required if TRANSLATION_ENGINE is "gemini".
     GEMINI_API_KEY=YOUR_API_KEY_HERE
     GEMINI_MODEL=gemini-1.5-flash-latest
-    
+
     # ---------------------------
     # OLLAMA SETTINGS
     # ---------------------------
@@ -67,25 +70,50 @@ This tool is designed for developers who need to automate the translation of PDF
     OLLAMA_MODEL=llama3
     ```
 
+    **Tips:**
+    - To use Gemini, get your API key at https://aistudio.google.com/app/apikey
+    - To use Ollama, make sure the model is available locally (e.g., `ollama pull llama3`)
+    - The engine is selected via `TRANSLATION_ENGINE` in your `.env` file.
+
 3.  **Install dependencies**:
     ```sh
     dart pub get
     ```
 
+
 ## Usage
 
-1.  Place a PDF file in the project's root directory (e.g., `sample.pdf`).
-2.  Run the translator from your terminal, optionally passing the path to your PDF as an argument.
+1.  Place a PDF file in the project directory (e.g., `sample.pdf`).
+2.  Run the translator from your terminal, passing the PDF path if you want:
 
-    ```sh
-    # Use the default 'sample.pdf'
-    dart run bin/translator.dart
-    
-    # Specify a different PDF file
-    dart run bin/translator.dart path/to/my_document.pdf
-    ```
+        ```sh
+        # Using the default 'sample.pdf'
+        dart run bin/translator.dart
+
+        # Specifying another PDF file
+        dart run bin/translator.dart path/to/my_document.pdf
+        ```
 
 3.  A new Markdown file (e.g., `my_document_translated.md`) will be created with the translated content.
+
+### Using with different processors and translators
+
+- PDF processing is done via strategies (Strategy Pattern). By default, Poppler (CLI) is used. For Flutter/mobile, implement your own strategy.
+- Translation is performed by classes implementing the `Translator` interface. The engine is selected automatically via `.env`.
+- For programmatic usage, see the example below:
+
+```dart
+import 'package:dart_pdf_translator/dart_pdf_translator.dart';
+
+void main() async {
+    final processor = PopplerPdfProcessor();
+    final pages = await processor.extractText('my.pdf');
+
+    final translator = GeminiTranslator('YOUR_API_KEY');
+    final translated = await translator.translate(text: pages[0], targetLanguage: 'Portuguese');
+    print(translated);
+}
+```
 
 ## Flutter Example App
 
@@ -106,15 +134,16 @@ This project includes a complete Flutter application in the `example/` directory
     ```
 4.  Use the "Pick PDF" button in the app to select a file and start the translation.
 
+
 ## Library vs. Executable
 
-This package is primarily designed as a command-line executable. However, its core components are exported as a library and can be used programmatically. See the `example/` directory for a basic illustration.
+This package can be used both as a CLI executable and as a library. The main components are exported for programmatic use. See the `example/` directory for usage examples.
 
 ## Publishing to Pub.dev
 
-This package is structured to be published on [pub.dev](https://pub.dev).
+This package is ready to be published on [pub.dev](https://pub.dev).
 
-1.  Update the `homepage` and `repository` URLs in `pubspec.yaml`.
-2.  Review the `LICENSE`, `CHANGELOG.md`, and documentation.
-3.  Run `dart pub publish --dry-run` to validate the package.
-4.  If validation passes, run `dart pub publish` to publish.
+1. Update the `homepage` and `repository` fields in `pubspec.yaml`.
+2. Review the `LICENSE`, `CHANGELOG.md`, and documentation.
+3. Run `dart pub publish --dry-run` to validate the package.
+4. If everything is OK, publish with `dart pub publish`.
