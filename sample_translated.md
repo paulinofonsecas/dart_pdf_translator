@@ -1,5 +1,6 @@
 # Translation of: sample.pdf
 
+<<<<<<< HEAD
 ## Page 1
 
 A Ponte de Prata
@@ -23,3 +24,5 @@ Antes que o mundo retome seu plano.
 Pois no sussurro do cinza matinal,
 Você encontra a alma de cada dia.
 
+=======
+>>>>>>> aba287b344b7fa554a34c5f4f4236e443d13cc17

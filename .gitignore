@@ -6,3 +6,4 @@
 .packages
 build/
 *.lock
+*._translated.md
