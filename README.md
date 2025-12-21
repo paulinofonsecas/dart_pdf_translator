@@ -17,18 +17,23 @@ This tool is designed for developers who need to automate the translation of PDF
 
 ## Prerequisites
 
-1.  **Dart SDK**: Make sure you have the [Dart SDK](https://dart.dev/get-dart) installed.
-2.  **Poppler (for PDF extraction)**: The command-line tools `pdftotext` and `pdfinfo` are required for PDF processing on desktop/CLI.
+1. **Dart SDK**: Make sure you have the [Dart SDK](https://dart.dev/get-dart) installed.
+2. **Poppler (for PDF extraction)**: The command-line tools `pdftotext` and `pdfinfo` are required for PDF processing on desktop/CLI.
 
-    -   **macOS (via Homebrew):**
+    - **macOS (via Homebrew):**
+
         ```sh
         brew install poppler
         ```
-    -   **Windows (via Winget - Recommended):**
+
+    - **Windows (via Winget - Recommended):**
+
         ```sh
         winget install poppler
         ```
-    -   **Linux (Debian/Ubuntu):**
+
+    - **Linux (Debian/Ubuntu):**
+
         ```sh
         sudo apt-get update && sudo apt-get install poppler-utils
         ```
@@ -39,11 +44,11 @@ This tool is designed for developers who need to automate the translation of PDF
 
 ## Setup
 
-1.  **Clone the repository** or download the source code.
+1. **Clone the repository** or download the source code.
 
-2.  **Configure your environment (.env):**
-    -   Copy `.env.example` to `.env`.
-    -   Edit the `.env` file and fill in the values according to your desired translation engine.
+2. **Configure your environment (.env):**
+    - Copy `.env.example` to `.env`.
+    - Edit the `.env` file and fill in the values according to your desired translation engine.
 
     ```dotenv
     # ---------------------------
@@ -71,30 +76,28 @@ This tool is designed for developers who need to automate the translation of PDF
     ```
 
     **Tips:**
-    - To use Gemini, get your API key at https://aistudio.google.com/app/apikey
+    - To use Gemini, get your API key at <https://aistudio.google.com/app/apikey>
     - To use Ollama, make sure the model is available locally (e.g., `ollama pull llama3`)
     - The engine is selected via `TRANSLATION_ENGINE` in your `.env` file.
 
-3.  **Install dependencies**:
+3. **Install dependencies**:
+
     ```sh
     dart pub get
     ```
 
-
 ## Usage
 
-1.  Place a PDF file in the project directory (e.g., `sample.pdf`).
-2.  Run the translator from your terminal, passing the PDF path if you want:
-
+1. Place a PDF file in the project directory (e.g., `sample.pdf`).
+2. Run the translator from your terminal, passing the PDF path if you want:
         ```sh
         # Using the default 'sample.pdf'
         dart run bin/translator.dart
-
         # Specifying another PDF file
         dart run bin/translator.dart path/to/my_document.pdf
         ```
 
-3.  A new Markdown file (e.g., `my_document_translated.md`) will be created with the translated content.
+3. A new Markdown file (e.g., `my_document_translated.md`) will be created with the translated content.
 
 ### Using with different processors and translators
 
@@ -123,17 +126,20 @@ This project includes a complete Flutter application in the `example/` directory
 
 ### Running the Example
 
-1.  **Set up the API Key**: Ensure you have a valid `GEMINI_API_KEY` in the main `.env` file at the root of *this* project (`ai_dart_pdf_translator/.env`). The example app is configured to read the key from there.
-2.  **Navigate to the example directory**:
+1. **Set up the API Key**: Ensure you have a valid `GEMINI_API_KEY` in the main `.env` file at the root of *this* project (`ai_dart_pdf_translator/.env`). The example app is configured to read the key from there.
+2. **Navigate to the example directory**:
+
     ```sh
     cd example
     ```
-3.  **Run the Flutter app**:
+
+3. **Run the Flutter app**:
+
     ```sh
     flutter run
     ```
-4.  Use the "Pick PDF" button in the app to select a file and start the translation.
 
+4. Use the "Pick PDF" button in the app to select a file and start the translation.
 
 ## Library vs. Executable
 
