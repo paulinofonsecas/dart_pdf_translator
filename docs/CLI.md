@@ -106,15 +106,15 @@ If you prefer to use this project as a package rather than the CLI, import the p
 import 'package:ai_dart_pdf_translator/ai_dart_pdf_translator.dart';
 
 void main() async {
-	final processor = PopplerPdfProcessor();
-	final pages = await processor.extractText('document.pdf');
+ final processor = PopplerPdfProcessor();
+ final pages = await processor.extractText('document.pdf');
 
-	final translator = GeminiTranslator('YOUR_KEY');
-	for (var i = 0; i < pages.length; i++) {
-		final t = await translator.translate(text: pages[i], targetLanguage: 'Portuguese');
-		print('--- Page ${i + 1} ---');
-		print(t);
-	}
+ final translator = GeminiTranslator('YOUR_KEY');
+ for (var i = 0; i < pages.length; i++) {
+  final t = await translator.translate(text: pages[i], targetLanguage: 'Portuguese');
+  print('--- Page ${i + 1} ---');
+  print(t);
+ }
 }
 ```
 

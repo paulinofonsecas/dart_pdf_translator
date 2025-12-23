@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- **Dart SDK**: Install from https://dart.dev/get-dart
+- **Dart SDK**: Install from <https://dart.dev/get-dart>
 - **Poppler (CLI tools)**: `pdftotext` and `pdfinfo` are required for PDF extraction.
 
 Install Poppler:

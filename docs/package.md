@@ -19,5 +19,6 @@ Future<void> main() async {
 ```
 
 Notes:
+
 - Use `PopplerPdfProcessor` for CLI/desktop. For Flutter/mobile, implement your own processor strategy.
 - Translators follow the `Translator` interface (see `lib/src/translators/translator.dart`).
