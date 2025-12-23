@@ -89,15 +89,61 @@ This tool is designed for developers who need to automate the translation of PDF
 ## Usage
 
 1. Place a PDF file in the project directory (e.g., `sample.pdf`).
-2. Run the translator from your terminal, passing the PDF path if you want:
-        ```sh
-        # Using the default 'sample.pdf'
-        dart run bin/translator.dart
-        # Specifying another PDF file
-        dart run bin/translator.dart path/to/my_document.pdf
-        ```
+2. Run the translator from your terminal, passing options or use global activation (recommended):
 
-3. A new Markdown file (e.g., `my_document_translated.md`) will be created with the translated content.
+    Install globally:
+
+    ```bash
+    dart pub global activate --source path .
+    ```
+
+    Example (Gemini):
+
+    ```bash
+    ai_pdf_translate --input my_study_material.pdf --output translated_gemini.pdf --api-key YOUR_GEMINI_KEY --target pt
+    ```
+
+    Example (Ollama local):
+
+    ```bash
+    ai_pdf_translate --input my_study_material.pdf --output translated_ollama.pdf --ollama-url http://localhost:11434 --ollama-model mistral --target pt
+    ```
+
+3. A new Markdown or PDF file (depending on `--output` extension) will be created with the translated content.
+
+For full CLI options and environment variable precedence, see the CLI documentation: [docs/CLI.md](docs/CLI.md)
+
+## Avoid running `pub get` on every CLI invocation
+
+If you see `Downloading packages...` when running the CLI (for example `ai_pdf_translate -h`), you can avoid that by compiling a native executable once and running it directly.
+
+On Windows (PowerShell):
+
+```powershell
+.\scriptsuild-exe.ps1
+```
+
+On macOS / Linux:
+
+```bash
+./scripts/build-exe.sh
+```
+
+After building, run the compiled executable directly (no Dart package resolution required):
+
+Windows:
+
+```powershell
+.\bin\ai_pdf_translate.exe -h
+```
+
+macOS / Linux:
+
+```bash
+./bin/ai_pdf_translate -h
+```
+
+Building the native executable packages all required dependencies into the binary, so you won't see `Downloading packages...` on subsequent runs.
 
 ### Using with different processors and translators
 
