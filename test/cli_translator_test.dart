@@ -1,7 +1,8 @@
 import 'package:test/test.dart';
-import 'package:ai_dart_pdf_translator/src/cli.dart';
 import 'package:ai_dart_pdf_translator/src/translators/gemini_translator.dart';
 import 'package:ai_dart_pdf_translator/src/translators/ollama_translator.dart';
+
+import '../bin/cli_translator.dart' show getTranslator;
 
 void main() {
   group('getTranslator', () {

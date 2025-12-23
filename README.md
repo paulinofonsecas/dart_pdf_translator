@@ -24,7 +24,7 @@ Quick start:
 
 ```bash
 dart pub get
-dart run bin/translator.dart --input sample.pdf
+dart run bin/cli_translator.dart --input sample.pdf
 ```
 
 Or build a native executable (see `docs/building.md`) and run directly.

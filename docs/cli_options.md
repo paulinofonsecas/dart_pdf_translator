@@ -9,13 +9,13 @@ Available flags and options:
 - `--api-key`      : Gemini API key (overrides `GEMINI_API_KEY` from `.env`). Required for Gemini.
 - `--gemini-model` : Gemini model name (overrides `GEMINI_MODEL`).
 - `--ollama-url`   : Ollama API base URL (e.g., `http://localhost:11434`) (overrides `OLLAMA_API_URL`).
-- `--ollama-model` : Ollama model name (overrides `OLLAMA_MODEL`).
-- `--page-step`    : Process every Nth page (defaults to `1`). Useful to sample or skip pages.
-- `--delay`        : Delay between page translations in seconds (defaults to `1`).
+-- `--ollama-model` : Ollama model name (overrides `OLLAMA_MODEL`).
+- `--delay`        : Delay between page translations in seconds (defaults to `0`).
+- `--parallel`     : Number of parallel translations to run (default: `1`).
 - `-h`, `--help`   : Show help.
 
 Environment variables (used when CLI flags are not provided):
 
-- `TRANSLATION_ENGINE`, `TARGET_LANGUAGE`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `OLLAMA_API_URL`, `OLLAMA_MODEL`, `PAGE_STEP`
+- `TRANSLATION_ENGINE`, `TARGET_LANGUAGE`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `OLLAMA_API_URL`, `OLLAMA_MODEL`, `TRANSLATION_DELAY`
 
 Precedence: CLI flags override `.env` values and environment variables.

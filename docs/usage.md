@@ -2,10 +2,10 @@
 
 This document shows basic CLI usage and examples.
 
-Run directly with Dart (development):
+Runs directly with Dart (development):
 
 ```bash
-dart run bin/translator.dart --input my.pdf --output out.md --target pt
+dart run bin/cli_translator.dart --input my.pdf --output out.md --target pt
 ```
 
 If you activated the package globally (`dart pub global activate`), run the installed executable:
@@ -18,6 +18,11 @@ Example (Ollama local):
 
 ```bash
 ai_pdf_translate --input my.pdf --output out.md --ollama-url http://localhost:11434 --ollama-model mistral --target pt
+
+Examples with new options:
+
+```bash
+dart run bin/cli_translator.dart --input my.pdf --output out.md --target pt --delay 2 --parallel 3
 ```
 
 Output behavior:
