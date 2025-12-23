@@ -4,6 +4,12 @@ This document describes the command-line interface for the `ai_pdf_translate` ex
 
 ## Installation
 
+Install the package globally:
+
+```bash
+dart pub global activate ai_dart_pdf_translator .
+```
+
 Install the package globally (from the project root):
 
 ```bash
@@ -92,4 +98,24 @@ macOS / Linux:
 
 The compiled native executable contains the package snapshot and does not trigger package resolution at runtime.
 
-*** End of CLI documentation ***
+## Using the library as a package
+
+If you prefer to use this project as a package rather than the CLI, import the public entrypoint and use the provided `PdfProcessor` and `Translator` implementations:
+
+```dart
+import 'package:ai_dart_pdf_translator/ai_dart_pdf_translator.dart';
+
+void main() async {
+	final processor = PopplerPdfProcessor();
+	final pages = await processor.extractText('document.pdf');
+
+	final translator = GeminiTranslator('YOUR_KEY');
+	for (var i = 0; i < pages.length; i++) {
+		final t = await translator.translate(text: pages[i], targetLanguage: 'Portuguese');
+		print('--- Page ${i + 1} ---');
+		print(t);
+	}
+}
+```
+
+Programmatic usage gives you more control over batching, parallelism, or custom post-processing.
