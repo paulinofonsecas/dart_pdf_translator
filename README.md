@@ -11,7 +11,6 @@ This tool is designed for developers who need to automate the translation of PDF
   - **Gemini**: Google's powerful and scalable translation models.
   - **Ollama**: Run translations locally using your own models (e.g., Llama3, Mistral) for privacy and offline use.
 - **Page-by-Page Processing**: Translates large documents page by page to avoid API context limits and provide incremental progress.
-# Dart PDF Translator
 
 A concise index of documentation for this project. See the linked pages for detailed instructions and examples.
 

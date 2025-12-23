@@ -21,6 +21,7 @@ ai_pdf_translate --input my.pdf --output out.md --ollama-url http://localhost:11
 ```
 
 Output behavior:
+
 - If `--output` ends with `.pdf` a simple PDF is generated; otherwise a Markdown file is written.
 
 See `docs/cli_options.md` for all flags and env precedence.
