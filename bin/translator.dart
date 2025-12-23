@@ -19,8 +19,8 @@ Future<void> main(List<String> arguments) async {
     ..addOption('gemini-model', help: 'Gemini model name')
     ..addOption('ollama-model', help: 'Ollama model name')
     ..addOption('ollama-url', help: 'Ollama API base URL (e.g., http://localhost:11434)')
-    ..addOption('page-step', help: 'Process every Nth page', defaultsTo: '1')
-    ..addOption('delay', help: 'Delay between page translations (seconds)', defaultsTo: '1')
+    ..addOption('delay', help: 'Delay between page translations (seconds)', defaultsTo: '0')
+    ..addOption('parallel', help: 'Number of parallel translations (default: 1)', defaultsTo: '1')
     ..addFlag('help', abbr: 'h', negatable: false, help: 'Show usage');
 
   ArgResults argResults;
@@ -42,22 +42,27 @@ Future<void> main(List<String> arguments) async {
   final outputPath = argResults['output'] as String? ?? '${pdfPath.split('.').first}_translated.md';
   final targetLanguage = argResults['target'] as String? ?? env['TARGET_LANGUAGE'] ?? 'English';
   final engine = (argResults['engine'] as String?) ?? env['TRANSLATION_ENGINE'] ?? 'gemini';
-  final pageStep = int.tryParse(argResults['page-step'] as String) ?? int.tryParse(env['PAGE_STEP'] ?? '1') ?? 1;
-  final translationDelay = Duration(seconds: int.tryParse(argResults['delay'] as String) ?? 1);
+  final translationDelay = Duration(seconds: int.tryParse(argResults['delay'] as String) ?? int.tryParse(env['TRANSLATION_DELAY'] ?? '0') ?? 0);
+  final parallelCount = int.tryParse(argResults['parallel'] as String) ?? 1;
 
   print('--- PDF Translator Initialized ---');
   print('Translation Engine: $engine');
   print('Target Language:    $targetLanguage');
   print('PDF File:           $pdfPath');
   print('Output File:        $outputPath');
-  print('Translation Delay:  ${translationDelay.inSeconds} seconds');
-  print('Page Step:          $pageStep');
+  if (translationDelay.inSeconds > 0) {
+    print('Translation Delay:  ${translationDelay.inSeconds} seconds');
+  }
+  // Page-step option removed; always translating every page.
+  if (parallelCount > 1) {
+    print('Parallel Tasks:     $parallelCount');
+  }
   print('------------------------------------');
 
   // --- 2. Prepare merged config and initialize translator ---
   final config = <String, String>{};
   // populate from env
-  for (final key in ['TRANSLATION_ENGINE', 'TARGET_LANGUAGE', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'OLLAMA_API_URL', 'OLLAMA_MODEL', 'PAGE_STEP']) {
+  for (final key in ['TRANSLATION_ENGINE', 'TARGET_LANGUAGE', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'OLLAMA_API_URL', 'OLLAMA_MODEL']) {
     final v = env[key];
     if (v != null) config[key] = v;
   }
@@ -98,38 +103,108 @@ Future<void> main(List<String> arguments) async {
   }
   print('✅ PDF read successfully. Found ${pages.length} pages.');
 
-  // --- 4. Translate page by page ---
-  final translatedPages = <String>[];
-  for (int i = 0; i < pages.length; i += pageStep) {
-    final pageText = pages[i];
-    if (pageText.trim().isEmpty) {
-      print('  - Page ${i + 1} is empty, skipping.');
-      translatedPages.add('');
-      continue;
-    }
+  // --- 4. Translate pages with support for parallelism ---
+  final translatedPages = List<String?>.filled(pages.length, null);
+  final totalPages = pages.length;
+  final pagesToTranslate = <int>[]; // Collect pages to translate (all pages)
 
-    print('  - Translating page ${i + 1} of ${pages.length}...');
-    try {
-      await Future.delayed(translationDelay);
-      final translatedText = await translator.translate(
-        text: pageText,
-        targetLanguage: targetLanguage,
-      );
-      translatedPages.add(translatedText);
-    } catch (e) {
-      print('  - ❌ Error translating page ${i + 1}: ${e.toString()}');
-      print('  - Skipping.');
-      continue;
+  for (int i = 0; i < totalPages; i++) {
+    pagesToTranslate.add(i);
+  }
+
+  print('📄 Pages to translate: ${pagesToTranslate.length} out of $totalPages');
+  
+  // Process pages in parallel if requested
+  if (parallelCount > 1) {
+    // Parallel processing
+    final futures = <Future<void>>[];
+    final semaphore = _Semaphore(parallelCount);
+    
+    int translatedCount = 0;
+    for (final pageIndex in pagesToTranslate) {
+      futures.add(semaphore.acquire(() async {
+        final pageNumber = pageIndex + 1;
+        final pageText = pages[pageIndex];
+        
+        if (pageText.trim().isEmpty) {
+          print('  - Page $pageNumber is empty, skipping.');
+          translatedPages[pageIndex] = '';
+          return;
+        }
+        
+        print('  ⟳ Translating page $pageNumber of $totalPages...');
+        try {
+          if (translationDelay.inSeconds > 0) {
+            await Future.delayed(translationDelay);
+          }
+          final translatedText = await translator.translate(
+            text: pageText,
+            targetLanguage: targetLanguage,
+          );
+          translatedPages[pageIndex] = translatedText;
+          print('    ✅ Pages translated successfully.');
+        } catch (e) {
+          print('  - ❌ Error translating pages : ${e.toString()}');
+          translatedPages[pageIndex] = '';
+        }
+      }));
+    }
+    
+    await Future.wait(futures);
+    translatedCount = pagesToTranslate.length;
+    print('✅ Translation complete! $translatedCount pages translated successfully (parallel mode).');
+    } else {
+    // Sequential processing
+    int translatedCount = 0;
+    for (int i = 0; i < totalPages; i++) {
+      final pageNumber = i + 1;
+      final pageText = pages[i];
+      if (pageText.trim().isEmpty) {
+        print('  - Page $pageNumber is empty, skipping.');
+        translatedPages[i] = '';
+        continue;
+      }
+
+      translatedCount++;
+      print('  ⟳ Translating page $pageNumber of $totalPages (translation $translatedCount of ${pagesToTranslate.length})...');
+      try {
+        if (translationDelay.inSeconds > 0) {
+          await Future.delayed(translationDelay);
+        }
+        final translatedText = await translator.translate(
+          text: pageText,
+          targetLanguage: targetLanguage,
+        );
+        translatedPages[i] = translatedText;
+        print('    ✅ Page $pageNumber translated successfully.');
+      } catch (e) {
+        print('  - ❌ Error translating page $pageNumber: ${e.toString()}');
+        translatedPages[i] = '';
+      }
+    }
+    print('✅ Translation complete! $translatedCount pages translated successfully.');
+  }
+
+  // Convert nulls to empty strings
+  final finalPages = translatedPages.map((p) => p ?? '').toList();
+  // Replace any truly-empty pages with the original extracted text when available,
+  // or a short placeholder explaining why the page is empty.
+  for (int i = 0; i < finalPages.length; i++) {
+    if (finalPages[i].trim().isEmpty) {
+      if (pages[i].trim().isNotEmpty) {
+        finalPages[i] = pages[i];
+      } else {
+        finalPages[i] = '_[No text extracted from page ${i + 1}. The page may contain images or scanned content.]_';
+      }
     }
   }
-  print('✅ pages translated successfully.');
 
   // --- 5. Save the translated content to output (md or pdf) ---
   try {
     if (outputPath.toLowerCase().endsWith('.pdf')) {
       final doc = pw.Document();
-      for (int i = 0; i < translatedPages.length; i++) {
-        final text = translatedPages[i];
+      for (int i = 0; i < finalPages.length; i++) {
+        final text = finalPages[i];
         doc.addPage(pw.Page(build: (pw.Context ctx) {
           return pw.Container(
             padding: const pw.EdgeInsets.all(16),
@@ -154,12 +229,12 @@ Future<void> main(List<String> arguments) async {
       markdownBuffer.writeln('# Translation of: $pdfPath');
       markdownBuffer.writeln();
 
-      for (int i = 0; i < translatedPages.length; i++) {
+      for (int i = 0; i < finalPages.length; i++) {
         markdownBuffer.writeln('## Page ${i + 1}');
         markdownBuffer.writeln();
-        markdownBuffer.writeln(translatedPages[i]);
+        markdownBuffer.writeln(finalPages[i]);
         markdownBuffer.writeln();
-        if (i < translatedPages.length - 1) {
+        if (i < finalPages.length - 1) {
           markdownBuffer.writeln('---');
           markdownBuffer.writeln();
         }
@@ -175,3 +250,22 @@ Future<void> main(List<String> arguments) async {
 }
 
 // Translator initialization is provided by `lib/src/cli.dart` (getTranslator).
+/// Simple semaphore implementation for limiting concurrent async operations
+class _Semaphore {
+  final int _max;
+  int _count = 0;
+
+  _Semaphore(this._max);
+
+  Future<T> acquire<T>(Future<T> Function() fn) async {
+    while (_count >= _max) {
+      await Future.delayed(const Duration(milliseconds: 10));
+    }
+    _count++;
+    try {
+      return await fn();
+    } finally {
+      _count--;
+    }
+  }
+}
